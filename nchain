@@ -1,1 +1,51 @@
-# nchain
+#!/usr/local/bin/perl
+#
+################################################################
+#
+# Filename: nchain 
+#
+# Description: Displays netgroup chain for the given host
+#
+# Usage: nchain <hostname>
+#
+# Author: jadew
+#
+# Current Maintainer: jadew
+#
+# Reviewer(s): ??
+#
+################################################################
+
+if (!($host = $ARGV[0])) {
+	print "Usage: nchain <hostname>\n";
+	exit;
+}
+
+if ($^O eq "linux") {
+	print "Must be run on Solaris, does not work on Linux.\n";
+	exit;
+}
+
+@groups = `nismatch host=$host.cisco.com netgroup.org_dir`;
+
+if ($#groups == -1) {
+	print "$host is not in any netgroups.\n";
+	exit;
+}
+
+print "$host is in the following netgroup(s):\n";
+
+foreach $group (@groups) {
+	split(/\s+/,$group);
+	walk_chain($_[0]);
+	print "\n";
+}
+
+sub walk_chain {
+	if (my $group=@_[0]) {
+		my @pgroup = split(/\s+/,`nismatch group=$group netgroup.org_dir`);
+		my $pgroup = @pgroup[0];
+		walk_chain($pgroup);
+		print "$group\n";
+	}
+}
