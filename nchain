@@ -16,7 +16,7 @@
 #
 ################################################################
 
-if (!($host = $ARGV[0])) {
+if (!($host = $ARGV[0]) or ($ARGV[0] eq "--man") or ($ARGV[0] eq "--help")) {
 	print "Usage: nchain <hostname>\n";
 	print "\n";
 	print "Displays all netgroups the given host is a member of (if any), and the ancestry of each of those netgroups.\n";
