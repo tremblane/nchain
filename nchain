@@ -19,20 +19,39 @@
 use warnings;
 use strict;
 
+use Pod::Usage;
+use Getopt::Long;
+
 #declarations
 my $host;
 my @chain;
+my $verbose1;
+my $verbose2;
 
-if (!($host = $ARGV[0]) or ($ARGV[0] eq "--man") or ($ARGV[0] eq "--help")) {
-	print "Usage: nchain <hostname>\n";
-	print "\n";
-	print "Displays all netgroups the given host is a member of (if any), and the ancestry of each of those netgroups.\n";
+
+#if (!($host = $ARGV[0]) or ($ARGV[0] eq "--man") or ($ARGV[0] eq "--help")) {
+#	print "Usage: nchain <hostname>\n";
+#	print "\n";
+#	print "Displays all netgroups the given host is a member of (if any), and the ancestry of each of those netgroups.\n";
+#	exit;
+#}
+
+GetOptions(
+	"--m|man" => \$verbose2,
+	"--h|help" => \$verbose1
+) or pod2usage( {'VERBOSE' => 0} );
+
+pod2usage( {'VERBOSE' => 1} ) if ( defined( $verbose1 ) );
+pod2usage( {'VERBOSE' => 2} ) if ( defined( $verbose2 ) );
+
+if ($^O eq "linux") {
+	pod2usage( -msg => "Must be run on Solaris, does not work on Linux.", -verbose => 0);
+	#print "Must be run on Solaris, does not work on Linux.\n";
 	exit;
 }
 
-if ($^O eq "linux") {
-	print "Must be run on Solaris, does not work on Linux.\n";
-	exit;
+if (!($host = $ARGV[0])) {
+	pod2usage( {'VERBOSE' => 0} )
 }
 
 my @groups = `nismatch host=$host.cisco.com netgroup.org_dir`;
@@ -72,3 +91,25 @@ sub print_chain {
 	}
 	print "\n";
 }
+
+__END__
+
+=pod
+
+=head1 NAME
+
+nchain - Displays netgroup chain for the given host
+
+=head1 SYNOPSIS
+
+nchain <hostname>
+
+nchain { --help | --man }
+
+   Note: Only works on Solaris hosts.
+
+=head1 DESCRIPTION
+
+Displays all netgroups the given host is a member of (if any), and the full ancestry of each of those netgroups.
+
+=cut
