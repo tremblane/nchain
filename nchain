@@ -16,6 +16,13 @@
 #
 ################################################################
 
+use warnings;
+use strict;
+
+#declarations
+my $host;
+my @chain;
+
 if (!($host = $ARGV[0]) or ($ARGV[0] eq "--man") or ($ARGV[0] eq "--help")) {
 	print "Usage: nchain <hostname>\n";
 	print "\n";
@@ -38,8 +45,8 @@ if ($#groups == -1) {
 print "$host is in the following netgroup(s):\n";
 
 foreach my $group (@groups) {
-	split(/\s+/,$group);
-	unshift(@chain, $_[0]);
+	($group) = split(/\s+/,$group);
+	unshift(@chain, $group);
 	walk_chain();
 	shift @chain;
 }
